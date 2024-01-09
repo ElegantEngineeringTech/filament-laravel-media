@@ -18,6 +18,8 @@ class FinllerMediaFileUpload extends FileUpload
 
     protected string|Closure|null $disk = null;
 
+    protected string|Closure|null $conversion = null;
+
     protected string|Closure|null $mediaName = null;
 
     /**
@@ -67,20 +69,21 @@ class FinllerMediaFileUpload extends FileUpload
 
             $url = null;
 
+            $conversion = $component->getConversion();
+
             if ($component->getVisibility() === 'private') {
-                $conversion = $component->getConversion();
 
                 try {
                     $url = $media?->getTemporaryUrl(
+                        $conversion,
                         now()->addMinutes(5),
-                        (filled($conversion) && $media->hasGeneratedConversion($conversion)) ? $conversion : '',
                     );
                 } catch (Throwable $exception) {
                     // This driver does not support creating temporary URLs.
                 }
             }
 
-            $url ??= $media?->getUrl($component->getConversion());
+            $url ??= $media?->getUrl($conversion);
 
             return [
                 'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
@@ -153,6 +156,13 @@ class FinllerMediaFileUpload extends FileUpload
         return $this;
     }
 
+    public function conversion(string|Closure|null $conversion): static
+    {
+        $this->conversion = $conversion;
+
+        return $this;
+    }
+
     /**
      * @param  array<string, mixed> | Closure | null  $metadata
      */
@@ -174,14 +184,19 @@ class FinllerMediaFileUpload extends FileUpload
             ->each(fn (Media $media) => $media->delete());
     }
 
-    public function getDiskName(): string
-    {
-        return $this->evaluate($this->disk);
-    }
-
     public function getCollection(): string
     {
         return $this->evaluate($this->collection);
+    }
+
+    public function getConversion(): string
+    {
+        return $this->evaluate($this->conversion);
+    }
+
+    public function getDisk(): string
+    {
+        return $this->evaluate($this->disk);
     }
 
     public function getGroup(): string
