@@ -199,17 +199,17 @@ class FinllerMediaFileUpload extends FileUpload
             ->each(fn (Media $media) => $media->delete());
     }
 
-    public function getCollection(): string
+    public function getCollection(): ?string
     {
         return $this->evaluate($this->collection);
     }
 
-    public function getConversion(): string
+    public function getConversion(): ?string
     {
         return $this->evaluate($this->conversion);
     }
 
-    public function getGroup(): string
+    public function getGroup(): ?string
     {
         return $this->evaluate($this->group);
     }
