@@ -32,7 +32,8 @@ class FinllerMediaFileUpload extends FileUpload
         parent::setUp();
 
         $this->loadStateFromRelationshipsUsing(static function (FinllerMediaFileUpload $component, Model $record): void {
-            $files = $record->load('media')->getMedia($component->getCollection())
+            $files = $record->load('media')
+                ->getMedia($component->getCollection(), $component->getGroup())
                 ->when(
                     ! $component->isMultiple(),
                     fn (Collection $files): Collection => $files->take(1),
@@ -112,24 +113,13 @@ class FinllerMediaFileUpload extends FileUpload
             }
 
             $media = $record->addMedia(
-                $file,
+                $file->getRealPath(),
                 collection_name: $component->getCollection(),
                 collection_group: $component->getGroup(),
                 name: $component->getMediaName($file),
                 metadata: $component->getMetadata(),
                 disk: $component->getDiskName()
             );
-
-            //  $mediaAdder
-            //     ->addCustomHeaders($component->getCustomHeaders())
-            //     ->usingFileName($filename)
-            //     ->usingName($component->getMediaName($file) ?? pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))
-            //     ->storingConversionsOnDisk($component->getConversionsDisk() ?? '')
-            //     ->withCustomProperties($component->getCustomProperties())
-            //     ->withManipulations($component->getManipulations())
-            //     ->withResponsiveImagesIf($component->hasResponsiveImages())
-            //     ->withProperties($component->getProperties())
-            //     ->toMediaCollection($component->getCollection(), $component->getDiskName());
 
             return $media->getAttributeValue('uuid');
         });
