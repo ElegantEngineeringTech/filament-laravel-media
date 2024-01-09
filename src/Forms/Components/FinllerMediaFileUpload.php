@@ -16,7 +16,7 @@ class FinllerMediaFileUpload extends FileUpload
 
     protected string|Closure|null $group = null;
 
-    protected string|Closure|null $disk = null;
+    protected string|Closure|null $diskName = null;
 
     protected string|Closure|null $conversion = null;
 
@@ -117,6 +117,7 @@ class FinllerMediaFileUpload extends FileUpload
                 collection_group: $component->getGroup(),
                 name: $component->getMediaName($file),
                 metadata: $component->getMetadata(),
+                disk: $component->getDiskName()
             );
 
             //  $mediaAdder
@@ -152,6 +153,13 @@ class FinllerMediaFileUpload extends FileUpload
     public function collection(string|Closure|null $collection): static
     {
         $this->collection = $collection;
+
+        return $this;
+    }
+
+    public function diskName(string|Closure|null $diskName): static
+    {
+        $this->diskName = $diskName;
 
         return $this;
     }
@@ -201,14 +209,14 @@ class FinllerMediaFileUpload extends FileUpload
         return $this->evaluate($this->conversion);
     }
 
-    public function getDisk(): string
-    {
-        return $this->evaluate($this->disk);
-    }
-
     public function getGroup(): string
     {
         return $this->evaluate($this->group);
+    }
+
+    public function getDiskName(): string
+    {
+        return $this->evaluate($this->diskName) ?? config('filament.default_filesystem_disk') ?? config('media.disk');
     }
 
     /**
