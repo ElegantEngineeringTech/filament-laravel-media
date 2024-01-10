@@ -129,12 +129,7 @@ class FinllerMediaFileUpload extends FileUpload
 
             $mediaClass = config('media.model', Media::class);
 
-            $mappedIds = $mediaClass::query()->whereIn('uuid', $uuids)->pluck('id', 'uuid')->toArray();
-
-            $mediaClass::reorder([
-                ...array_flip($uuids),
-                ...$mappedIds,
-            ]);
+            $mediaClass::reorder($uuids, using: 'uuid');
 
             return $state;
         });
