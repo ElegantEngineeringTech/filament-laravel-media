@@ -32,7 +32,7 @@ class FinllerMediaFileUpload extends FileUpload
         parent::setUp();
 
         $this->loadStateFromRelationshipsUsing(static function (FinllerMediaFileUpload $component, Model $record): void {
-            $files = $record->load('media')
+            $files = $record
                 ->getMedia($component->getCollection(), $component->getGroup())
                 ->when(
                     ! $component->isMultiple(),
