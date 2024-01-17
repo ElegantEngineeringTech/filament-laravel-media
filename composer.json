@@ -4,7 +4,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.1",
-    "finller/laravel-media": "dev-main",
+    "finller/laravel-media": "^0.0.1",
     "illuminate/support": "^10.0"
   },
   "require-dev": {
