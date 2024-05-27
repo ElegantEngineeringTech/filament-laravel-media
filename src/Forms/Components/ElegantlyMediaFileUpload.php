@@ -3,6 +3,7 @@
 namespace Filament\Forms\Components;
 
 use Closure;
+use Elegantly\Media\Contracts\InteractWithMedia;
 use Elegantly\Media\Models\Media;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -61,12 +62,19 @@ class ElegantlyMediaFileUpload extends FileUpload
         $this->dehydrated(false);
 
         $this->getUploadedFileUsing(static function (ElegantlyMediaFileUpload $component, string $file): ?array {
-            if (! $component->getRecord()) {
+            /** @var null|(Model&InteractWithMedia) $record */
+            $record = $component->getRecord();
+
+            if (! $record) {
                 return null;
             }
 
             /** @var ?Media $media */
-            $media = $component->getRecord()->getRelationValue('media')->firstWhere('uuid', $file);
+            $media = $record->getMedia()->firstWhere('uuid', $file);
+
+            if (! $media) {
+                return null;
+            }
 
             $url = null;
 
@@ -87,9 +95,9 @@ class ElegantlyMediaFileUpload extends FileUpload
             $url ??= $media?->getUrl($conversion);
 
             return [
-                'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
-                'size' => $media->getAttributeValue('size'),
-                'type' => $media->getAttributeValue('mime_type'),
+                'name' => $media->getName($conversion),
+                'size' => $media->getSize($conversion),
+                'type' => $media->getMimeType($conversion),
                 'url' => $url,
             ];
         });

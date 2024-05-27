@@ -4,7 +4,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.1",
-    "elegantly/laravel-media": "^2.0.0",
+    "elegantly/laravel-media": "^2.1.1",
     "illuminate/support": "^10.|^11.0"
   },
   "require-dev": {
