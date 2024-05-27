@@ -35,7 +35,7 @@ class ElegantlyMediaFileUpload extends FileUpload
             $files = $record
                 ->getMedia($component->getCollection(), $component->getGroup())
                 ->when(
-                    !$component->isMultiple(),
+                    ! $component->isMultiple(),
                     fn (Collection $files): Collection => $files->take(1),
                 )
                 ->mapWithKeys(function (Media $file): array {
@@ -61,7 +61,7 @@ class ElegantlyMediaFileUpload extends FileUpload
         $this->dehydrated(false);
 
         $this->getUploadedFileUsing(static function (ElegantlyMediaFileUpload $component, string $file): ?array {
-            if (!$component->getRecord()) {
+            if (! $component->getRecord()) {
                 return null;
             }
 
@@ -100,12 +100,12 @@ class ElegantlyMediaFileUpload extends FileUpload
         });
 
         $this->saveUploadedFileUsing(static function (ElegantlyMediaFileUpload $component, TemporaryUploadedFile $file, ?Model $record): ?string {
-            if (!method_exists($record, 'addMedia')) {
+            if (! method_exists($record, 'addMedia')) {
                 return $file;
             }
 
             try {
-                if (!$file->exists()) {
+                if (! $file->exists()) {
                     return null;
                 }
             } catch (UnableToCheckFileExistence $exception) {
