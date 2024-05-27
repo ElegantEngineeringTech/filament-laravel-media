@@ -3,12 +3,12 @@
 namespace Filament\Tables\Columns;
 
 use Closure;
-use Finller\Media\Models\Media;
+use Elegantly\Media\Models\Media;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Throwable;
 
-class FinllerMediaImageColumn extends ImageColumn
+class ElegantlyMediaImageColumn extends ImageColumn
 {
     protected string|Closure|null $collection = null;
 
@@ -49,6 +49,7 @@ class FinllerMediaImageColumn extends ImageColumn
 
     public function getImageUrl(?string $state = null): ?string
     {
+        /** @var InteractWithMedia $record */
         $record = $this->getRecord();
 
         if ($this->queriesRelationships($record)) {
@@ -56,7 +57,7 @@ class FinllerMediaImageColumn extends ImageColumn
         }
 
         /** @var ?Media $media */
-        $media = $record->media->first(fn (Media $media): bool => $media->uuid === $state);
+        $media = $record->media->firstWhere('uuid', $state);
 
         if (! $media) {
             return null;

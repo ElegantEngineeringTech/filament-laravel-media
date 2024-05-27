@@ -1,11 +1,11 @@
-# Filament Finller Media Plugin
+# Filament Elegantly Media Plugin
 
 ## Installation
 
 Install the plugin with Composer:
 
 ```bash
-composer require finller/laravel-media-plugin:"^3.1" -W
+composer require elegantly/laravel-media-plugin:"^3.1" -W
 ```
 
 If you haven't already done so, you need to publish the migration to create the media table:
@@ -20,18 +20,18 @@ Run the migrations:
 php artisan migrate
 ```
 
-You must also [prepare your Eloquent model](https://github.com/finller/laravel-media) for attaching media.
+You must also [prepare your Eloquent model](https://github.com/elegantengineeringtech/laravel-media) for attaching media.
 
-> For more information, check out [Finller's documentation](https://github.com/finller/laravel-media).
+> For more information, check out [Elegantly's documentation](https://github.com/elegantengineeringtech/laravel-media).
 
 ## Form component
 
 You may use the field in the same way as the [original file upload](https://filamentphp.com/docs/forms/fields/file-upload) field:
 
 ```php
-use Filament\Forms\Components\FinllerMediaFileUpload;
+use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
-FinllerMediaFileUpload::make('avatar')
+ElegantlyMediaFileUpload::make('avatar')
 ```
 
 The media library file upload supports all the customization options of the [original file upload component](https://filamentphp.com/docs/forms/fields/file-upload).
@@ -40,18 +40,18 @@ The media library file upload supports all the customization options of the [ori
 
 ### Passing a collection
 
-Optionally, you may pass a [`collection()`](https://github.com/finller/laravel-media) allows you to group files into categories:
+Optionally, you may pass a [`collection()`](https://github.com/elegantengineeringtech/laravel-media) allows you to group files into categories:
 
 ```php
-use Filament\Forms\Components\FinllerMediaFileUpload;
+use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
-FinllerMediaFileUpload::make('avatar')
+ElegantlyMediaFileUpload::make('avatar')
     ->collection('avatars')
 ```
 
 ### Configuring the storage disk and directory
 
-By default, files will be uploaded publicly to your storage disk defined in the [Filament configuration file](https://filamentphp.com/docs/forms/installation#publishing-configuration). You can also set the `FILAMENT_FILESYSTEM_DISK` environment variable to change this. This is to ensure consistency between all Filament packages. Finller's disk configuration will not be used, unless you [define a disk for a registered collection](https://github.com/finller/laravel-media).
+By default, files will be uploaded publicly to your storage disk defined in the [Filament configuration file](https://filamentphp.com/docs/forms/installation#publishing-configuration). You can also set the `FILAMENT_FILESYSTEM_DISK` environment variable to change this. This is to ensure consistency between all Filament packages. Elegantly's disk configuration will not be used, unless you [define a disk for a registered collection](https://github.com/elegantengineeringtech/laravel-media).
 
 Alternatively, you can manually set the disk with the `disk()` method:
 
@@ -62,18 +62,18 @@ FileUpload::make('attachment')
     ->disk('s3')
 ```
 
-The base file upload component also has configuration options for setting the `directory()` and `visibility()` of uploaded files. These are not used by the media library file upload component. Finller's package has its own system for determining the directory of a newly-uploaded file, and it does not support uploading private files out of the box. One way to store files privately is to configure this in your S3 bucket settings, in which case you should also use `visibility('private')` to ensure that Filament generates temporary URLs for your files.
+The base file upload component also has configuration options for setting the `directory()` and `visibility()` of uploaded files. These are not used by the media library file upload component. Elegantly's package has its own system for determining the directory of a newly-uploaded file, and it does not support uploading private files out of the box. One way to store files privately is to configure this in your S3 bucket settings, in which case you should also use `visibility('private')` to ensure that Filament generates temporary URLs for your files.
 
 ### Reordering files
 
-In addition to the behaviour of the normal file upload, Finller's Media Library also allows users to reorder files.
+In addition to the behaviour of the normal file upload, Elegantly's Media Library also allows users to reorder files.
 
 To enable this behaviour, use the `reorderable()` method:
 
 ```php
-use Filament\Forms\Components\FinllerMediaFileUpload;
+use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
-FinllerMediaFileUpload::make('attachments')
+ElegantlyMediaFileUpload::make('attachments')
     ->multiple()
     ->reorderable()
 ```
@@ -82,12 +82,12 @@ You may now drag and drop files into order.
 
 ### Adding custom properties
 
-You may pass in [custom properties](https://github.com/finller/laravel-media) when uploading files using the `customProperties()` method:
+You may pass in [custom properties](https://github.com/elegantengineeringtech/laravel-media) when uploading files using the `customProperties()` method:
 
 ```php
-use Filament\Forms\Components\FinllerMediaFileUpload;
+use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
-FinllerMediaFileUpload::make('attachments')
+ElegantlyMediaFileUpload::make('attachments')
     ->multiple()
     ->customProperties(['zip_filename_prefix' => 'folder/subfolder/'])
 ```
@@ -97,9 +97,9 @@ FinllerMediaFileUpload::make('attachments')
 You may also specify a `conversion()` to load the file from showing it in the form, if present:
 
 ```php
-use Filament\Forms\Components\FinllerMediaFileUpload;
+use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
-FinllerMediaFileUpload::make('attachments')
+ElegantlyMediaFileUpload::make('attachments')
     ->conversion('thumb')
 ```
 
@@ -108,9 +108,9 @@ FinllerMediaFileUpload::make('attachments')
 You can store your conversions and responsive images on a disk other than the one where you save the original file. Pass the name of the disk where you want conversion to be saved to the `conversionsDisk()` method:
 
 ```php
-use Filament\Forms\Components\FinllerMediaFileUpload;
+use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
-FinllerMediaFileUpload::make('attachments')
+ElegantlyMediaFileUpload::make('attachments')
     ->conversionsDisk('s3')
 ```
 
@@ -119,9 +119,9 @@ FinllerMediaFileUpload::make('attachments')
 To use the media library image column:
 
 ```php
-use Filament\Tables\Columns\FinllerMediaImageColumn;
+use Filament\Tables\Columns\ElegantlyMediaImageColumn;
 
-FinllerMediaImageColumn::make('avatar')
+ElegantlyMediaImageColumn::make('avatar')
 ```
 
 The media library image column supports all the customization options of the [original image column](https://filamentphp.com/docs/tables/columns/image).
@@ -131,9 +131,9 @@ The media library image column supports all the customization options of the [or
 Optionally, you may pass a `collection()`:
 
 ```php
-use Filament\Tables\Columns\FinllerMediaImageColumn;
+use Filament\Tables\Columns\ElegantlyMediaImageColumn;
 
-FinllerMediaImageColumn::make('avatar')
+ElegantlyMediaImageColumn::make('avatar')
     ->collection('avatars')
 ```
 
@@ -142,9 +142,9 @@ FinllerMediaImageColumn::make('avatar')
 You may also specify a `conversion()` to load the file from showing it in the table, if present:
 
 ```php
-use Filament\Tables\Columns\FinllerMediaImageColumn;
+use Filament\Tables\Columns\ElegantlyMediaImageColumn;
 
-FinllerMediaImageColumn::make('avatar')
+ElegantlyMediaImageColumn::make('avatar')
     ->conversion('thumb')
 ```
 
@@ -153,9 +153,9 @@ FinllerMediaImageColumn::make('avatar')
 To use the media library image entry:
 
 ```php
-use Filament\Infolists\Components\FinllerMediaImageEntry;
+use Filament\Infolists\Components\ElegantlyMediaImageEntry;
 
-FinllerMediaImageEntry::make('avatar')
+ElegantlyMediaImageEntry::make('avatar')
 ```
 
 The media library image entry supports all the customization options of the [original image entry](https://filamentphp.com/docs/infolists/entries/image).
@@ -165,9 +165,9 @@ The media library image entry supports all the customization options of the [ori
 Optionally, you may pass a `collection()`:
 
 ```php
-use Filament\Infolists\Components\FinllerMediaImageEntry;
+use Filament\Infolists\Components\ElegantlyMediaImageEntry;
 
-FinllerMediaImageEntry::make('avatar')
+ElegantlyMediaImageEntry::make('avatar')
     ->collection('avatars')
 ```
 
@@ -176,8 +176,8 @@ FinllerMediaImageEntry::make('avatar')
 You may also specify a `conversion()` to load the file from showing it in the infolist, if present:
 
 ```php
-use Filament\Infolists\Components\FinllerMediaImageEntry;
+use Filament\Infolists\Components\ElegantlyMediaImageEntry;
 
-FinllerMediaImageEntry::make('avatar')
+ElegantlyMediaImageEntry::make('avatar')
     ->conversion('thumb')
 ```

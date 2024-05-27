@@ -3,10 +3,10 @@
 namespace Filament\Infolists\Components;
 
 use Closure;
-use Finller\Media\Models\Media;
+use Elegantly\Media\Models\Media;
 use Throwable;
 
-class FinllerMediaImageEntry extends ImageEntry
+class ElegantlyMediaImageEntry extends ImageEntry
 {
     protected string|Closure|null $collection = null;
 

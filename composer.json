@@ -1,10 +1,10 @@
 {
-  "name": "finller/filament-media-plugin",
-  "description": "Filament support for `finller/laravel-media`.",
+  "name": "elegantly/filament-media-plugin",
+  "description": "Filament support for `elegantly/laravel-media`.",
   "license": "MIT",
   "require": {
     "php": "^8.1",
-    "finller/laravel-media": "^1.0.0",
+    "elegantly/laravel-media": "^2.0.0",
     "illuminate/support": "^10.|^11.0"
   },
   "require-dev": {

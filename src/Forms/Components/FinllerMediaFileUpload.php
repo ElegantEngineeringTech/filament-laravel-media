@@ -3,14 +3,14 @@
 namespace Filament\Forms\Components;
 
 use Closure;
-use Finller\Media\Models\Media;
+use Elegantly\Media\Models\Media;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use League\Flysystem\UnableToCheckFileExistence;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 
-class FinllerMediaFileUpload extends FileUpload
+class ElegantlyMediaFileUpload extends FileUpload
 {
     protected string|Closure|null $collection = null;
 
@@ -31,11 +31,11 @@ class FinllerMediaFileUpload extends FileUpload
     {
         parent::setUp();
 
-        $this->loadStateFromRelationshipsUsing(static function (FinllerMediaFileUpload $component, Model $record): void {
+        $this->loadStateFromRelationshipsUsing(static function (ElegantlyMediaFileUpload $component, Model $record): void {
             $files = $record
                 ->getMedia($component->getCollection(), $component->getGroup())
                 ->when(
-                    ! $component->isMultiple(),
+                    !$component->isMultiple(),
                     fn (Collection $files): Collection => $files->take(1),
                 )
                 ->mapWithKeys(function (Media $file): array {
@@ -60,8 +60,8 @@ class FinllerMediaFileUpload extends FileUpload
 
         $this->dehydrated(false);
 
-        $this->getUploadedFileUsing(static function (FinllerMediaFileUpload $component, string $file): ?array {
-            if (! $component->getRecord()) {
+        $this->getUploadedFileUsing(static function (ElegantlyMediaFileUpload $component, string $file): ?array {
+            if (!$component->getRecord()) {
                 return null;
             }
 
@@ -94,18 +94,18 @@ class FinllerMediaFileUpload extends FileUpload
             ];
         });
 
-        $this->saveRelationshipsUsing(static function (FinllerMediaFileUpload $component) {
+        $this->saveRelationshipsUsing(static function (ElegantlyMediaFileUpload $component) {
             $component->deleteAbandonedFiles();
             $component->saveUploadedFiles();
         });
 
-        $this->saveUploadedFileUsing(static function (FinllerMediaFileUpload $component, TemporaryUploadedFile $file, ?Model $record): ?string {
-            if (! method_exists($record, 'addMedia')) {
+        $this->saveUploadedFileUsing(static function (ElegantlyMediaFileUpload $component, TemporaryUploadedFile $file, ?Model $record): ?string {
+            if (!method_exists($record, 'addMedia')) {
                 return $file;
             }
 
             try {
-                if (! $file->exists()) {
+                if (!$file->exists()) {
                     return null;
                 }
             } catch (UnableToCheckFileExistence $exception) {
@@ -124,7 +124,7 @@ class FinllerMediaFileUpload extends FileUpload
             return $media->getAttributeValue('uuid');
         });
 
-        $this->reorderUploadedFilesUsing(static function (FinllerMediaFileUpload $component, array $state): array {
+        $this->reorderUploadedFilesUsing(static function (ElegantlyMediaFileUpload $component, array $state): array {
             $uuids = array_filter(array_values($state));
 
             $mediaClass = config('media.model', Media::class);
