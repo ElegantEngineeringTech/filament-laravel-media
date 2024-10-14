@@ -84,8 +84,8 @@ class ElegantlyMediaFileUpload extends FileUpload
 
                 try {
                     $url = $media?->getTemporaryUrl(
-                        $conversion,
-                        now()->addMinutes(5),
+                        expiration: now()->addMinutes(5),
+                        conversion: $conversion,
                     );
                 } catch (Throwable $exception) {
                     // This driver does not support creating temporary URLs.
@@ -108,7 +108,7 @@ class ElegantlyMediaFileUpload extends FileUpload
         });
 
         $this->saveUploadedFileUsing(static function (ElegantlyMediaFileUpload $component, TemporaryUploadedFile $file, ?Model $record): ?string {
-            if (! method_exists($record, 'addMedia')) {
+            if (! ($record instanceof InteractWithMedia)) {
                 return $file;
             }
 
@@ -122,10 +122,10 @@ class ElegantlyMediaFileUpload extends FileUpload
 
             $media = $record->addMedia(
                 $file->getRealPath(),
-                collection_name: $component->getCollection(),
-                collection_group: $component->getGroup(),
+                collectionName: $component->getCollection(),
+                collectionGroup: $component->getGroup(),
                 name: $component->getMediaName($file),
-                metadata: $component->getMetadata(),
+                // metadata: $component->getMetadata(),
                 disk: $component->getDiskName()
             );
 
@@ -135,6 +135,7 @@ class ElegantlyMediaFileUpload extends FileUpload
         $this->reorderUploadedFilesUsing(static function (ElegantlyMediaFileUpload $component, array $state): array {
             $uuids = array_filter(array_values($state));
 
+            /** @var class-string<Media> */
             $mediaClass = config('media.model', Media::class);
 
             $mediaClass::reorder($uuids, using: 'uuid');
