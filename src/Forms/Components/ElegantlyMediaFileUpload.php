@@ -163,6 +163,13 @@ class ElegantlyMediaFileUpload extends FileUpload
         return $this;
     }
 
+    public function group(string|Closure|null $group): static
+    {
+        $this->group = $group;
+
+        return $this;
+    }
+
     public function conversion(string|Closure|null $conversion): static
     {
         $this->conversion = $conversion;
