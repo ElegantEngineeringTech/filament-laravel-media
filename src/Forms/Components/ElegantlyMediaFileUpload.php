@@ -121,7 +121,7 @@ class ElegantlyMediaFileUpload extends FileUpload
             }
 
             $media = $record->addMedia(
-                $file->getRealPath(),
+                file: $file->getRealPath(),
                 collectionName: $component->getCollection(),
                 collectionGroup: $component->getGroup(),
                 name: $component->getMediaName($file),
