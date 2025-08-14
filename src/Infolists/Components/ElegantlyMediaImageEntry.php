@@ -3,18 +3,60 @@
 namespace Filament\Infolists\Components;
 
 use Closure;
-use Elegantly\Media\Models\Media;
+use Elegantly\Media\Contracts\InteractWithMedia;
+use Filament\Support\Concerns\HasMediaFilter;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Throwable;
 
 class ElegantlyMediaImageEntry extends ImageEntry
 {
-    protected string|Closure|null $collection = null;
+    use HasMediaFilter;
+
+    protected string|Closure $collection = 'default';
 
     protected string|Closure|null $group = null;
 
     protected string|Closure|null $conversion = null;
 
-    public function collection(string|Closure|null $collection): static
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->defaultImageUrl(function (ElegantlyMediaImageEntry $component, Model $record): ?string {
+            if ($component->hasRelationship($record)) {
+                $record = $component->getRelationshipResults($record);
+            }
+
+            /** @var InteractWithMedia[] $records */
+            $records = Arr::wrap($record);
+
+            $collection = $component->getCollection();
+
+            foreach ($records as $record) {
+                /** conversion specific fallback url are not supported */
+                if ($conversion = $component->getConversion()) {
+                    continue;
+                }
+
+                if (! $collection) {
+                    continue;
+                }
+
+                $url = value($record->getMediaCollection($collection)?->fallback);
+
+                if (blank($url)) {
+                    continue;
+                }
+
+                return $url;
+            }
+
+            return null;
+        });
+    }
+
+    public function collection(string|Closure $collection): static
     {
         $this->collection = $collection;
 
@@ -35,7 +77,7 @@ class ElegantlyMediaImageEntry extends ImageEntry
         return $this;
     }
 
-    public function getCollection(): ?string
+    public function getCollection(): string
     {
         return $this->evaluate($this->collection);
     }
@@ -58,33 +100,40 @@ class ElegantlyMediaImageEntry extends ImageEntry
             return null;
         }
 
-        $relationshipName = $this->getRelationshipName();
-
-        if (filled($relationshipName)) {
-            $record = $record->getRelationValue($relationshipName);
+        if ($this->hasRelationship($record)) {
+            $record = $this->getRelationshipResults($record);
         }
 
-        /** @var ?Media $media */
-        $media = $record->media->first(fn (Media $media): bool => $media->uuid === $state);
+        /** @var InteractWithMedia[] $records */
+        $records = Arr::wrap($record);
 
-        if (! $media) {
-            return null;
-        }
+        foreach ($records as $record) {
 
-        $conversion = $this->getConversion();
+            $media = $record->media->first(fn ($media): bool => $media->uuid === $state);
 
-        if ($this->getVisibility() === 'private') {
-            try {
-                return $media->getTemporaryUrl(
-                    $conversion,
-                    now()->addMinutes(5),
-                );
-            } catch (Throwable $exception) {
-                // This driver does not support creating temporary URLs.
+            if (! $media) {
+                continue;
             }
+
+            $conversion = $this->getConversion();
+
+            if ($this->getVisibility() === 'private') {
+                try {
+                    return $media->getTemporaryUrl(
+                        expiration: now()->addMinutes(5),
+                        conversion: $conversion,
+                    );
+                } catch (Throwable $exception) {
+                    // This driver does not support creating temporary URLs.
+                }
+            }
+
+            return $media->getUrl(
+                conversion: $conversion,
+            );
         }
 
-        return $media->getUrl($conversion);
+        return null;
     }
 
     /**
@@ -92,23 +141,34 @@ class ElegantlyMediaImageEntry extends ImageEntry
      */
     public function getState(): array
     {
+        $record = $this->getRecord();
+
+        if ($this->hasRelationship($record)) {
+            $record = $this->getRelationshipResults($record);
+        }
+
+        /** @var InteractWithMedia[] $records */
+        $records = Arr::wrap($record);
+
+        $state = [];
+
         $collection = $this->getCollection();
         $group = $this->getGroup();
 
-        return $this->getRecord()->getRelationValue('media')
-            ->filter(function (Media $media) use ($collection, $group): bool {
-                if (filled($collection) && $media->collection_name !== $collection) {
-                    return false;
-                }
+        foreach ($records as $record) {
+            $state = [
+                ...$state,
+                ...$record->getMedia($collection, $group)
+                    ->when(
+                        $this->hasMediaFilter(),
+                        fn (Collection $media) => $this->filterMedia($media)
+                    )
+                    ->sortBy('order_column')
+                    ->pluck('uuid')
+                    ->all(),
+            ];
+        }
 
-                if (filled($group) && $media->collection_group !== $group) {
-                    return false;
-                }
-
-                return true;
-            })
-            ->sortBy('order')
-            ->map(fn (Media $media): string => $media->uuid)
-            ->all();
+        return array_unique($state);
     }
 }
