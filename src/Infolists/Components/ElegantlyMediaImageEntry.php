@@ -4,7 +4,9 @@ namespace Filament\Infolists\Components;
 
 use Closure;
 use Elegantly\Media\Contracts\InteractWithMedia;
+use Elegantly\Media\Models\Media;
 use Filament\Support\Concerns\HasMediaFilter;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Throwable;
@@ -24,8 +26,8 @@ class ElegantlyMediaImageEntry extends ImageEntry
         parent::setUp();
 
         $this->defaultImageUrl(function (ElegantlyMediaImageEntry $component, Model $record): ?string {
-            if ($component->hasRelationship($record)) {
-                $record = $component->getRelationshipResults($record);
+            if ($component->hasStateRelationship($record)) {
+                $record = $component->getStateRelationshipResults($record);
             }
 
             /** @var InteractWithMedia[] $records */
@@ -100,8 +102,8 @@ class ElegantlyMediaImageEntry extends ImageEntry
             return null;
         }
 
-        if ($this->hasRelationship($record)) {
-            $record = $this->getRelationshipResults($record);
+        if ($this->hasStateRelationship($record)) {
+            $record = $this->getStateRelationshipResults($record);
         }
 
         /** @var InteractWithMedia[] $records */
@@ -109,7 +111,8 @@ class ElegantlyMediaImageEntry extends ImageEntry
 
         foreach ($records as $record) {
 
-            $media = $record->media->first(fn ($media): bool => $media->uuid === $state);
+            /** @var ?Media $media */
+            $media = $record->getRelationValue('media')->first(fn (Media $media): bool => $media->uuid === $state);
 
             if (! $media) {
                 continue;
@@ -143,8 +146,8 @@ class ElegantlyMediaImageEntry extends ImageEntry
     {
         $record = $this->getRecord();
 
-        if ($this->hasRelationship($record)) {
-            $record = $this->getRelationshipResults($record);
+        if ($this->hasStateRelationship($record)) {
+            $record = $this->getStateRelationshipResults($record);
         }
 
         /** @var InteractWithMedia[] $records */

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Filament\Forms\Components;
 
 use Closure;
@@ -60,16 +58,10 @@ class ElegantlyMediaFileUpload extends FileUpload
                 })
                 ->toArray();
 
-            $component->state($media);
+            $component->rawState($media);
         });
 
-        $this->afterStateHydrated(static function (BaseFileUpload $component, string|array|null $state): void {
-            if (is_array($state)) {
-                return;
-            }
-
-            $component->state([]);
-        });
+        $this->afterStateHydrated(null);
 
         $this->beforeStateDehydrated(null);
 
@@ -86,12 +78,10 @@ class ElegantlyMediaFileUpload extends FileUpload
             $url = null;
 
             if ($component->getVisibility() === 'private') {
-                $conversion = $component->getConversion();
-
                 try {
                     $url = $media?->getTemporaryUrl(
                         expiration: now()->addMinutes(5),
-                        conversion: $conversion,
+                        conversion: $component->getConversion(),
                         fallback: true,
                     );
                 } catch (Throwable $exception) {
@@ -112,7 +102,7 @@ class ElegantlyMediaFileUpload extends FileUpload
             ];
         });
 
-        $this->saveRelationshipsUsing(static function (ElegantlyMediaFileUpload $component) {
+        $this->saveRelationshipsUsing(static function (ElegantlyMediaFileUpload $component): void {
             $component->deleteAbandonedFiles();
             $component->saveUploadedFiles();
         });
@@ -140,20 +130,18 @@ class ElegantlyMediaFileUpload extends FileUpload
             return $media->getAttributeValue('uuid');
         });
 
-        $this->reorderUploadedFilesUsing(static function (ElegantlyMediaFileUpload $component, ?Model $record, array $state): array {
-            $uuids = array_filter(array_values($state));
+        $this->reorderUploadedFilesUsing(static function (ElegantlyMediaFileUpload $component, ?Model $record, array $rawState): array {
+            $uuids = array_filter(array_keys($rawState));
 
-            $mediaClass = ($record && method_exists($record, 'getMediaModel')) ? $record->getMediaModel() : null;
-            $mediaClass ??= config('media-library.media_model', Media::class);
+            /** @var class-string<Media> */
+            $mediaClass ??= config('media.model', Media::class);
 
-            $mappedIds = $mediaClass::query()->whereIn('uuid', $uuids)->pluck(app($mediaClass)->getKeyName(), 'uuid')->toArray();
+            $mediaClass::reorder(
+                $uuids,
+                using: 'uuid'
+            );
 
-            $mediaClass::setNewOrder([
-                ...array_flip($uuids),
-                ...$mappedIds,
-            ]);
-
-            return $state;
+            return $rawState;
         });
     }
 
@@ -213,7 +201,7 @@ class ElegantlyMediaFileUpload extends FileUpload
 
         $record
             ->getMedia($this->getCollection() ?? 'default')
-            ->whereNotIn('uuid', array_keys($this->getState() ?? []))
+            ->whereNotIn('uuid', array_keys($this->getRawState() ?? []))
             ->when($this->hasMediaFilter(), fn (Collection $media): Collection => $this->filterMedia($media))
             ->each(fn (Media $media) => $record->deleteMedia($media->id));
     }
