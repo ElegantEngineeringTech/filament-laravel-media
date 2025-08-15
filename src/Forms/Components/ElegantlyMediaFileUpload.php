@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Filament\Forms\Components;
 
 use Closure;
@@ -10,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use League\Flysystem\UnableToCheckFileExistence;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use Spatie\MediaLibrary\HasMedia;
 use Throwable;
 
 class ElegantlyMediaFileUpload extends FileUpload
@@ -41,8 +42,8 @@ class ElegantlyMediaFileUpload extends FileUpload
     {
         parent::setUp();
 
-        $this->loadStateFromRelationshipsUsing(static function (ElegantlyMediaFileUpload $component, HasMedia $record): void {
-            /** @var Model&HasMedia $record */
+        $this->loadStateFromRelationshipsUsing(static function (ElegantlyMediaFileUpload $component, InteractWithMedia $record): void {
+            /** @var Model&InteractWithMedia $record */
             $media = $record->load('media')->getMedia($component->getCollection())
                 ->when(
                     $component->hasMediaFilter(),
@@ -131,7 +132,7 @@ class ElegantlyMediaFileUpload extends FileUpload
                 collectionName: $component->getCollection(),
                 collectionGroup: $component->getGroup(),
                 name: $component->getMediaName($file),
-                disk: $component->getDiskName(),
+                disk: $component->getDiskName() ?: null,
                 metadata: $component->getMetadata(),
                 attributes: $component->getProperties(),
             );
@@ -217,9 +218,9 @@ class ElegantlyMediaFileUpload extends FileUpload
             ->each(fn (Media $media) => $record->deleteMedia($media->id));
     }
 
-    public function getDiskName(): ?string
+    public function getDiskName(): string
     {
-        return $this->evaluate($this->diskName);
+        return $this->evaluate($this->diskName) ?? '';
     }
 
     public function getCollection(): string
