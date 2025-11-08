@@ -20,16 +20,16 @@ class ElegantlyMediaFileAttachmentProvider implements FileAttachmentProvider
 
     protected RichContentAttribute $attribute;
 
-    protected string $collection = 'default';
+    protected string $collectionName = 'default';
 
     public static function make(): static
     {
         return app(static::class);
     }
 
-    public function collection(?string $collection): static
+    public function collectionName(?string $collectionName): static
     {
-        $this->collection = $collection;
+        $this->collectionName = $collectionName;
 
         return $this;
     }
@@ -62,7 +62,7 @@ class ElegantlyMediaFileAttachmentProvider implements FileAttachmentProvider
         }
 
         /** @var Collection<string, Media> $media */
-        $media = $this->getExistingModel()?->getMedia($this->getCollection())->keyBy('uuid');
+        $media = $this->getExistingModel()?->getMedia($this->getCollectionName())->keyBy('uuid');
 
         return $this->media = $media;
     }
@@ -99,7 +99,7 @@ class ElegantlyMediaFileAttachmentProvider implements FileAttachmentProvider
         return $this->getExistingModel() /** @phpstan-ignore method.notFound */
             ->addMedia(
                 file: $file->getRealPath(),
-                collectionName: $this->getCollection(),
+                collectionName: $this->getCollectionName(),
                 disk: $this->attribute->getFileAttachmentsDiskName(),
                 name: (string) Str::ulid()
             )
@@ -112,7 +112,7 @@ class ElegantlyMediaFileAttachmentProvider implements FileAttachmentProvider
     public function cleanUpFileAttachments(array $exceptIds): void
     {
         $model = $this->getExistingModel();
-        $collectionName = $this->getCollection();
+        $collectionName = $this->getCollectionName();
 
         $model->clearMediaCollection(
             $collectionName,
@@ -131,8 +131,8 @@ class ElegantlyMediaFileAttachmentProvider implements FileAttachmentProvider
         return true;
     }
 
-    public function getCollection(): string
+    public function getCollectionName(): string
     {
-        return $this->collection ?? $this->attribute->getName();
+        return $this->collectionName ?? $this->attribute->getName();
     }
 }

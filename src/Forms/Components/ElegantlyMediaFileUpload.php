@@ -16,13 +16,13 @@ class ElegantlyMediaFileUpload extends FileUpload
 {
     use HasMediaFilter;
 
-    protected string|Closure $collection = 'default';
+    protected string|Closure $collectionName = 'default';
 
-    protected string|Closure|null $group = null;
+    protected string|Closure|null $groupName = null;
 
     protected string|Closure|null $diskName = null;
 
-    protected string|Closure|null $conversion = null;
+    protected string|Closure|null $conversionName = null;
 
     protected string|Closure|null $mediaName = null;
 
@@ -42,7 +42,7 @@ class ElegantlyMediaFileUpload extends FileUpload
 
         $this->loadStateFromRelationshipsUsing(static function (ElegantlyMediaFileUpload $component, InteractWithMedia $record): void {
             /** @var Model&InteractWithMedia $record */
-            $media = $record->load('media')->getMedia($component->getCollection())
+            $media = $record->load('media')->getMedia($component->getCollectionName())
                 ->when(
                     $component->hasMediaFilter(),
                     fn (Collection $media) => $component->filterMedia($media)
@@ -81,7 +81,7 @@ class ElegantlyMediaFileUpload extends FileUpload
                 try {
                     $url = $media?->getTemporaryUrl(
                         expiration: now()->addMinutes(5),
-                        conversion: $component->getConversion(),
+                        conversion: $component->getConversionName(),
                         fallback: true,
                     );
                 } catch (Throwable $exception) {
@@ -90,7 +90,7 @@ class ElegantlyMediaFileUpload extends FileUpload
             }
 
             $url ??= $media?->getUrl(
-                conversion: $component->getConversion(),
+                conversion: $component->getConversionName(),
                 fallback: true,
             );
 
@@ -119,8 +119,8 @@ class ElegantlyMediaFileUpload extends FileUpload
 
             $media = $record->addMedia(
                 file: $file->getRealPath(),
-                collectionName: $component->getCollection(),
-                collectionGroup: $component->getGroup(),
+                collectionName: $component->getCollectionName(),
+                collectionGroup: $component->getGroupName(),
                 name: $component->getMediaName($file),
                 disk: $component->getDiskName() ?: null,
                 metadata: $component->getMetadata(),
@@ -145,23 +145,23 @@ class ElegantlyMediaFileUpload extends FileUpload
         });
     }
 
-    public function collection(string|Closure $collection): static
+    public function collectionName(string|Closure $collectionName): static
     {
-        $this->collection = $collection;
+        $this->collectionName = $collectionName;
 
         return $this;
     }
 
-    public function group(string|Closure|null $group): static
+    public function groupName(string|Closure|null $groupName): static
     {
-        $this->group = $group;
+        $this->groupName = $groupName;
 
         return $this;
     }
 
-    public function conversion(string|Closure|null $conversion): static
+    public function conversionName(string|Closure|null $conversionName): static
     {
-        $this->conversion = $conversion;
+        $this->conversionName = $conversionName;
 
         return $this;
     }
@@ -200,7 +200,7 @@ class ElegantlyMediaFileUpload extends FileUpload
         $record = $this->getRecord();
 
         $record
-            ->getMedia($this->getCollection() ?? 'default')
+            ->getMedia($this->getCollectionName() ?? 'default')
             ->whereNotIn('uuid', array_keys($this->getRawState() ?? []))
             ->when($this->hasMediaFilter(), fn (Collection $media): Collection => $this->filterMedia($media))
             ->each(fn (Media $media) => $record->deleteMedia($media->id));
@@ -211,19 +211,19 @@ class ElegantlyMediaFileUpload extends FileUpload
         return $this->evaluate($this->diskName) ?? '';
     }
 
-    public function getCollection(): string
+    public function getCollectionName(): string
     {
-        return $this->evaluate($this->collection);
+        return $this->evaluate($this->collectionName);
     }
 
-    public function getGroup(): ?string
+    public function getGroupName(): ?string
     {
-        return $this->evaluate($this->group);
+        return $this->evaluate($this->groupName);
     }
 
-    public function getConversion(): ?string
+    public function getConversionName(): ?string
     {
-        return $this->evaluate($this->conversion);
+        return $this->evaluate($this->conversionName);
     }
 
     /**

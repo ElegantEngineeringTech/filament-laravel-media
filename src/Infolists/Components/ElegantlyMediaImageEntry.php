@@ -15,11 +15,11 @@ class ElegantlyMediaImageEntry extends ImageEntry
 {
     use HasMediaFilter;
 
-    protected string|Closure $collection = 'default';
+    protected string|Closure $collectionName = 'default';
 
-    protected string|Closure|null $group = null;
+    protected string|Closure|null $groupName = null;
 
-    protected string|Closure|null $conversion = null;
+    protected string|Closure|null $conversionName = null;
 
     protected function setUp(): void
     {
@@ -33,19 +33,19 @@ class ElegantlyMediaImageEntry extends ImageEntry
             /** @var InteractWithMedia[] $records */
             $records = Arr::wrap($record);
 
-            $collection = $component->getCollection();
+            $collectionName = $component->getCollectionName();
 
             foreach ($records as $record) {
                 /** conversion specific fallback url are not supported */
-                if ($conversion = $component->getConversion()) {
+                if ($conversionName = $component->getConversionName()) {
                     continue;
                 }
 
-                if (! $collection) {
+                if (! $collectionName) {
                     continue;
                 }
 
-                $url = value($record->getMediaCollection($collection)?->fallback);
+                $url = value($record->getMediaCollection($collectionName)?->fallback);
 
                 if (blank($url)) {
                     continue;
@@ -58,40 +58,40 @@ class ElegantlyMediaImageEntry extends ImageEntry
         });
     }
 
-    public function collection(string|Closure $collection): static
+    public function collectionName(string|Closure $collectionName): static
     {
-        $this->collection = $collection;
+        $this->collectionName = $collectionName;
 
         return $this;
     }
 
-    public function group(string|Closure|null $group): static
+    public function groupName(string|Closure|null $groupName): static
     {
-        $this->group = $group;
+        $this->groupName = $groupName;
 
         return $this;
     }
 
-    public function conversion(string|Closure|null $conversion): static
+    public function conversionName(string|Closure|null $conversionName): static
     {
-        $this->conversion = $conversion;
+        $this->conversionName = $conversionName;
 
         return $this;
     }
 
-    public function getCollection(): string
+    public function getCollectionName(): string
     {
-        return $this->evaluate($this->collection);
+        return $this->evaluate($this->collectionName);
     }
 
-    public function getGroup(): ?string
+    public function getGroupName(): ?string
     {
-        return $this->evaluate($this->group);
+        return $this->evaluate($this->groupName);
     }
 
-    public function getConversion(): ?string
+    public function getConversionName(): ?string
     {
-        return $this->evaluate($this->conversion);
+        return $this->evaluate($this->conversionName);
     }
 
     public function getImageUrl(?string $state = null): ?string
@@ -118,13 +118,13 @@ class ElegantlyMediaImageEntry extends ImageEntry
                 continue;
             }
 
-            $conversion = $this->getConversion();
+            $conversionName = $this->getConversionName();
 
             if ($this->getVisibility() === 'private') {
                 try {
                     return $media->getTemporaryUrl(
                         expiration: now()->addMinutes(5),
-                        conversion: $conversion,
+                        conversion: $conversionName,
                     );
                 } catch (Throwable $exception) {
                     // This driver does not support creating temporary URLs.
@@ -132,7 +132,7 @@ class ElegantlyMediaImageEntry extends ImageEntry
             }
 
             return $media->getUrl(
-                conversion: $conversion,
+                conversion: $conversionName,
             );
         }
 
@@ -155,13 +155,13 @@ class ElegantlyMediaImageEntry extends ImageEntry
 
         $state = [];
 
-        $collection = $this->getCollection();
-        $group = $this->getGroup();
+        $collectionName = $this->getCollectionName();
+        $groupName = $this->getGroupName();
 
         foreach ($records as $record) {
             $state = [
                 ...$state,
-                ...$record->getMedia($collection, $group)
+                ...$record->getMedia($collectionName, $groupName)
                     ->when(
                         $this->hasMediaFilter(),
                         fn (Collection $media) => $this->filterMedia($media)

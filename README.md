@@ -38,13 +38,13 @@ The media file upload supports all the customization options of the [original fi
 
 ### Passing a collection
 
-Optionally, you may pass a [`collection()`](https://github.com/ElegantEngineeringTech/laravel-media#defining-media-collections) allows you to group files into categories:
+Optionally, you may pass a [`collectionName()`](https://github.com/ElegantEngineeringTech/laravel-media#defining-media-collections) allows you to group files into categories:
 
 ```php
 use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
 ElegantlyMediaFileUpload::make('avatar')
-    ->collection('avatars')
+    ->collectionName('avatars')
 ```
 
 ### Configuring the storage disk and directory
@@ -90,13 +90,13 @@ ElegantlyMediaFileUpload::make('attachments')
 
 ### Using conversions
 
-You may also specify a `conversion()` to load the file from showing it in the form, if present:
+You may also specify a `conversionName()` to load the file from showing it in the form, if present:
 
 ```php
 use Filament\Forms\Components\ElegantlyMediaFileUpload;
 
 ElegantlyMediaFileUpload::make('attachments')
-    ->conversion('thumb')
+    ->conversionName('thumb')
 ```
 
 ### Filtering media
@@ -144,7 +144,7 @@ class Post extends Model implements HasRichContent
 }
 ```
 
-A media collection with the same name as the attribute (`content` in this example) will be used for the file attachments. The collection must not contain any other media apart from file attachments for that attribute, since Filament will clear any unused media from the collection when the model is saved. To customize the name of the collection, you can pass it to the `collection()` method of the provider:
+A media collection with the same name as the attribute (`content` in this example) will be used for the file attachments. The collection must not contain any other media apart from file attachments for that attribute, since Filament will clear any unused media from the collection when the model is saved. To customize the name of the collection, you can pass it to the `collectionName()` method of the provider:
 
 ```php
 use Filament\Forms\Components\RichEditor\FileAttachmentProviders\ElegantlyMediaFileAttachmentProvider;
@@ -161,7 +161,7 @@ class Post extends Model implements HasRichContent
         $this->registerRichContent('content')
             ->fileAttachmentsProvider(
                 ElegantlyMediaFileAttachmentProvider::make()
-                    ->collection('content-file-attachments'),
+                    ->collectionName('content-file-attachments'),
             );
     }
 }
@@ -181,13 +181,13 @@ The media library image column supports all the customization options of the [or
 
 ### Passing a collection
 
-Optionally, you may pass a `collection()`:
+Optionally, you may pass a `collectionName()`:
 
 ```php
 use Filament\Tables\Columns\ElegantlyMediaImageColumn;
 
 ElegantlyMediaImageColumn::make('avatar')
-    ->collection('avatars')
+    ->collectionName('avatars')
 ```
 
 By default, only media without a collection (using the `default` collection) will be shown. If you want to show media from all collections, you can use the `allCollections()` method:
@@ -201,13 +201,13 @@ ElegantlyMediaImageColumn::make('avatar')
 
 ### Using conversions
 
-You may also specify a `conversion()` to load the file from showing it in the table, if present:
+You may also specify a `conversionName()` to load the file from showing it in the table, if present:
 
 ```php
 use Filament\Tables\Columns\ElegantlyMediaImageColumn;
 
 ElegantlyMediaImageColumn::make('avatar')
-    ->conversion('thumb')
+    ->conversionName('thumb')
 ```
 
 ### Filtering media
@@ -243,13 +243,13 @@ The media library image entry supports all the customization options of the [ori
 
 ### Passing a collection
 
-Optionally, you may pass a `collection()`:
+Optionally, you may pass a `collectionName()`:
 
 ```php
 use Filament\Infolists\Components\ElegantlyMediaImageEntry;
 
 ElegantlyMediaImageEntry::make('avatar')
-    ->collection('avatars')
+    ->collectionName('avatars')
 ```
 
 By default, only media without a collection (using the `default` collection) will be shown. If you want to show media from all collections, you can use the `allCollections()` method:
@@ -263,13 +263,13 @@ ElegantlyMediaImageEntry::make('avatar')
 
 ### Using conversions
 
-You may also specify a `conversion()` to load the file from showing it in the infolist, if present:
+You may also specify a `conversionName()` to load the file from showing it in the infolist, if present:
 
 ```php
 use Filament\Infolists\Components\ElegantlyMediaImageEntry;
 
 ElegantlyMediaImageEntry::make('avatar')
-    ->conversion('thumb')
+    ->conversionName('thumb')
 ```
 
 ### Filtering media
