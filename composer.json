@@ -9,7 +9,7 @@
   },
   "require": {
     "php": "^8.2",
-    "filament/support": "^4.0.0",
+    "filament/support": "^5.0.0",
     "elegantly/laravel-media": "^4.0"
   },
   "require-dev": {
