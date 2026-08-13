@@ -203,6 +203,7 @@ class ElegantlyMediaFileUpload extends FileUpload
             ->getMedia($this->getCollectionName() ?? 'default')
             ->whereNotIn('uuid', array_keys($this->getRawState() ?? []))
             ->when($this->hasMediaFilter(), fn (Collection $media): Collection => $this->filterMedia($media))
+            ->loadMissing(['conversions'])
             ->each(fn (Media $media) => $record->deleteMedia($media->id));
     }
 
